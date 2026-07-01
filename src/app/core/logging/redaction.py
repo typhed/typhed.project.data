@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 """
-Logging Constants - Reserved & Sensitive Keyword Checks
--------------------------------------------------------
+Logging Configuration - Reserved & Sensitive Keyword Checks
+-----------------------------------------------------------
 
 Logging does not automatically redacts sensitive information which is
 a security concern. The logging parts are divided to seperate and
