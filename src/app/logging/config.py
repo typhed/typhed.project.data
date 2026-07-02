@@ -11,7 +11,7 @@ based on the incoming project name.
 import sys
 import logging
 
-from app.logging.formatter import JsonFormatter
+from app.logging.formatter import JSONFormatter
 
 def configure_logging(level : str = "INFO") -> None:
     """
@@ -25,7 +25,7 @@ def configure_logging(level : str = "INFO") -> None:
     """
 
     handler = logging.StreamHandler(stream = sys.stdout)
-    handler.setFormatter(JsonFormatter())
+    handler.setFormatter(JSONFormatter())
 
     root = logging.getLogger()
     root.handlers.clear()

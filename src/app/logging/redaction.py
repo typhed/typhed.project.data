@@ -10,6 +10,7 @@ replace the sensitive parts with default asterix values.
 """
 
 import logging
+from typing import Any, Dict
 
 RESERVED_RECORD_KEYS = frozenset(vars(logging.makeLogRecord({})).keys())
 
@@ -18,7 +19,7 @@ RESERVED_RECORD_KEYS = frozenset(vars(logging.makeLogRecord({})).keys())
 # passed via ``extra=`` never reaches the log stream.
 SENSITIVE_KEY_PARTS = (
     "secret", "password", "passwd", "token", "authorization",
-    "api_key", "apikey", "database_url", "dsn", "host", "hostname"
+    "api_key", "apikey", "database_url", "dsn", "hostname"
 )
 
 
@@ -31,14 +32,14 @@ def is_sensitive(key : str) -> bool:
     return any(part in key.lower() for part in SENSITIVE_KEY_PARTS)
 
 
-def redacted_logstring(record : dict) -> dict:
+def redacted_logstring(record : logging.LogRecord) -> Dict[str, Any]:
     """
     Gracefully redacts the sensitive information from the logging
     message and returns a clean message with "***" inplace of secrets.
     """
 
     return {
-        key : {"***" if is_sensitive(key) else value}
+        key : ("***" if is_sensitive(key) else value)
         for key, value in record.__dict__.items() if (
             key not in RESERVED_RECORD_KEYS and not key.startswith("_")
         )

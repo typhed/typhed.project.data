@@ -47,7 +47,7 @@ class JSONFormatter(logging.Formatter):
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
 
-        extras = redacted_logstring(extras)
+        extras = redacted_logstring(record)
         payload.update(extras)
 
         return json.dumps(payload, default = str)
