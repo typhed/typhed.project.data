@@ -50,10 +50,10 @@ class ProjectSettings(BaseSettings):
     )
 
     db_max_overflow : int = Field(
-        20, ge = 20, description = "DB Maximum Overflow Limit"
+        20, ge = 0, description = "DB Maximum Overflow Limit"
     )
 
-    db_pool_recyle : int = Field(
+    db_pool_recycle : int = Field(
         1_800, ge = -1, description = "DB Pool Recycle Size"
     )
 
@@ -86,4 +86,4 @@ def get_settings() -> "ProjectSettings":
     mutating the environment.
     """
 
-    return ProjectSettings()
+    return ProjectSettings() # type: ignore
