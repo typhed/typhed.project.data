@@ -18,7 +18,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import ORMBase
 
-class UserProfile(ORMBase):
+class ClerkUserProfile(ORMBase):
     """
     The shared identity row for a Clerk User ID. Every  sub-project schema
     references :attr:`clerk_id` through a cross-schema foreign key, so

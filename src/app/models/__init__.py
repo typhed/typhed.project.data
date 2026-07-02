@@ -10,3 +10,10 @@ the shared :class:`~app.models.base.Base` metadata in full. Alembic's (migration
 all tables across every schema in the PostgreSQL database.
 """
 
+from app.models.base import ORMBase, TimestampMixin
+from app.models.identity import ClerkUserProfile, WebhookEvent
+
+__all__ = [
+    "ORMBase", "TimestampMixin",
+    "ClerkUserProfile", "WebhookEvent"
+]
