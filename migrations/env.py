@@ -21,11 +21,29 @@ from alembic import context
 from sqlalchemy import pool, MetaData
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.models import ORMBase
-from app.core.config import get_settings
 
 metadata : Union[MetaData, Sequence[MetaData], None] = ORMBase.metadata
+
+
+class MigrationSettings(BaseSettings):
+    """
+    Minimal, migration-scoped settings that read only the database DSN.
+
+    The Alembic environment must run in database-only contexts (for
+    example continuous integration) where unrelated application secrets
+    such as the Clerk signing secret are legitimately absent, so it
+    deliberately avoids the full :class:`~app.core.config.ProjectSettings`
+    model to stay decoupled from the request-time configuration.
+    """
+
+    model_config = SettingsConfigDict(
+        env_file = ".env", case_sensitive = False, extra = "ignore"
+    )
+
+    database_url : str
 
 def run_migrations(connection : Connection) -> None:
     """
@@ -39,7 +57,8 @@ def run_migrations(connection : Connection) -> None:
     """
     context.configure(
         connection = connection, target_metadata = metadata,
-        include_schemas = True, compare_type = True
+        include_schemas = True, compare_type = True,
+        compare_server_default = True
     )
 
     with context.begin_transaction():
@@ -75,8 +94,8 @@ def run_migrations_offline() -> None:
     context.configure(
         url = config.get_main_option("sqlalchemy.url"),
         target_metadata = metadata, include_schemas = True,
-        compare_type = True, literal_binds = True,
-        dialect_opts = {"paramstyle" : "named"}
+        compare_type = True, compare_server_default = True,
+        literal_binds = True, dialect_opts = {"paramstyle" : "named"}
     )
 
     with context.begin_transaction():
@@ -91,10 +110,13 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option(
-    "sqlalchemy.url", get_settings().database_url
-)
+database_url = MigrationSettings().database_url # type: ignore
+
+# ! escape "%" so ConfigParser interpolation does not choke on the DSN
+config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 
 # get the environment context, and run migrations in mode::
-run_migrations_offline() if context.is_offline_mode() \
-    else asyncio.run(run_migrations_online())
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    asyncio.run(run_migrations_online())

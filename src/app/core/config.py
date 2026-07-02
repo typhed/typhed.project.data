@@ -41,7 +41,7 @@ class ProjectSettings(BaseSettings):
     )
 
     clerk_webhook_signing_secret : str = Field(
-        ..., description = "Clerk/Svix Webhook Signing Secret"
+        ..., pattern = r"^whsec_.+", description = "Clerk/Svix Signing Secret"
     )
 
     # SQLAlchemy Connection Pool Tunneling
