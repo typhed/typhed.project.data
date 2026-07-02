@@ -11,7 +11,7 @@ based on the incoming project name.
 import sys
 import logging
 
-from app.core.logging.formatter import JsonFormatter
+from app.logging.formatter import JsonFormatter
 
 def configure_logging(level : str = "INFO") -> None:
     """

@@ -15,7 +15,7 @@ import datetime as dt
 
 from typing import Any, Dict
 
-from app.core.logging.redaction import redacted_logstring
+from app.logging.redaction import redacted_logstring
 
 class JSONFormatter(logging.Formatter):
     """
