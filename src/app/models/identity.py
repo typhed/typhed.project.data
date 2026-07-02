@@ -36,7 +36,7 @@ class ClerkUserProfile(ORMBase):
         String(320), index = True, unique = True, nullable = False
     )
 
-    username = Mapped[str] = mapped_column(
+    username : Mapped[str] = mapped_column(
         String(255), index = True, unique = True, nullable = False
     )
 
