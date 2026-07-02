@@ -50,9 +50,8 @@ def run_migrations(connection : Connection) -> None:
 
 async def run_migrations_online() -> None:
     """
-    Create the asynchronous engine and drive the migration run while
-    the system is running - allowed only when there is not table lock
-    in progress else may result in data loss.
+    Create the asynchronous engine, open a connection, and drive the
+    migration run through ``connection.run_sync``.
     """
 
     connectable = async_engine_from_config(
@@ -69,13 +68,15 @@ async def run_migrations_online() -> None:
 
 def run_migrations_offline() -> None:
     """
-    Emit the migration SQL scripts with a live database connection,
-    best for database initialization and handles data safely.
+    Emit the migration SQL without opening a live database connection,
+    e.g. for generating a SQL script (``--sql``) instead of applying it.
     """
 
     context.configure(
         url = config.get_main_option("sqlalchemy.url"),
-        literal_binds = True, dialect_opts = {"paramstyle" : "named"}
+        target_metadata = metadata, include_schemas = True,
+        compare_type = True, literal_binds = True,
+        dialect_opts = {"paramstyle" : "named"}
     )
 
     with context.begin_transaction():
@@ -84,17 +85,16 @@ def run_migrations_offline() -> None:
     return
 
 
-if __name__ == "__main__":
-    config = context.config
+config = context.config
 
-    # configure file name, get details, to patch url
-    if config.config_file_name is not None:
-        fileConfig(config.config_file_name)
+# configure file name, get details, to patch url
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
 
-    config.set_main_option(
-        "sqlalchemy.url", get_settings().database_url
-    )
+config.set_main_option(
+    "sqlalchemy.url", get_settings().database_url
+)
 
-    # get the environment context, and run migrations in mode::
-    run_migrations_offline() if context.is_offline_mode() \
-        else asyncio.run(run_migrations_online())
+# get the environment context, and run migrations in mode::
+run_migrations_offline() if context.is_offline_mode() \
+    else asyncio.run(run_migrations_online())
